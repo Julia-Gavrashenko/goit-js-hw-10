@@ -4,23 +4,45 @@ import Notiflix from 'notiflix';
 const debounce = require('lodash.debounce');
 const DEBOUNCE_DELAY = 300;
 
-function fetchCountries() {
-  const BASE_URL = `https://restcountries.com/v3.1/all`;
-  return fetch(`${BASE_URL}?fields=name,capital,population,languages,flags`).then(
-    responce => {
-      if (!responce.ok) {
-        throw new Error(responce.statusText);
-      }
-      //   console.log(responce);
+const inputEl = document.querySelector(`#search-box`);
+const listEl = document.querySelector(`country-list`);
+const searchedCountry = document.querySelector(`country-info`);
 
-      return responce.json();
+// console.log(inputEl)
+
+inputEl.addEventListener(`input`, onFormElInput);
+
+function fetchCountries(name) {
+  const BASE_URL = `https://restcountries.com/v3.1/name/${name}`;
+  return fetch(
+    `${BASE_URL}?fields=name,flags,capital,population,languages`
+  ).then(responce => {
+    if (!responce.ok) {
+      throw new Error(responce.statusText);
     }
-  );
+    console.log(responce);
+
+    return responce.json();
+  });
 }
 
-fetchCountries().then(data => console.log(data));
 
 
-function createMarkup(data) {
-    
+function onFormElInput(event) {
+  // console.log(event.currentTarget.value);
+
+  const inputValue = event.currentTarget.value.trim();
+
+  if (inputValue) {
+    fetchCountries(inputValue).then(data => console.log(data));
+  } else{
+    // remove list
+  }
+}
+
+
+function createMarkup(arr) {
+const markup = arr.map( el => `<li>${el.name}</li>`);
+
+listEl.
 }
