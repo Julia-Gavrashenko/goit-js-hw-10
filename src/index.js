@@ -10,7 +10,7 @@ const searchedCountry = document.querySelector(`country-info`);
 
 // console.log(inputEl)
 
-inputEl.addEventListener(`input`, onFormElInput);
+inputEl.addEventListener(`input`, debounce(onFormElInput, DEBOUNCE_DELAY));
 
 function fetchCountries(name) {
   const BASE_URL = `https://restcountries.com/v3.1/name/${name}`;
@@ -44,5 +44,5 @@ function onFormElInput(event) {
 function createMarkup(arr) {
 const markup = arr.map( el => `<li>${el.name}</li>`);
 
-listEl.
+// listEl.
 }
