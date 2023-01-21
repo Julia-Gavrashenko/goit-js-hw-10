@@ -1,7 +1,6 @@
 import './css/styles.css';
 import Notiflix from 'notiflix';
 
-
 const debounce = require('lodash.debounce');
 const DEBOUNCE_DELAY = 300;
 
@@ -9,9 +8,9 @@ const inputEl = document.querySelector(`#search-box`);
 const listEl = document.querySelector(`.country-list`);
 const searchedCountry = document.querySelector(`.country-info`);
 
-// console.log(inputEl)
 
-inputEl.addEventListener('input', onFormElInput);
+
+// console.log(inputEl)
 
 function fetchCountries(name) {
   const BASE_URL = `https://restcountries.com/v3.1/name/${name}`;
@@ -27,50 +26,64 @@ function fetchCountries(name) {
   });
 }
 
-function onFormElInput(event) {
-  const inputValue = event.currentTarget.value.trim();
+inputEl.addEventListener('input', debounce(onFormElInput, DEBOUNCE_DELAY));
 
-  if (inputValue === '') {
+function onFormElInput(event) {
+  const inputValue = event.target.value.trim();
+
+  if (!inputValue) {
+    clearMarkup();
     return;
   }
 
   fetchCountries(inputValue)
-    .then(data => {
-      console.log(data);
-
-      if (data.length > 10) {
-        Notiflix.Notify.info(
-          'Too many matches found. Please enter a more specific name.'
-        );
-      }
-        if (data.length === 1) {
-          createCountryMarkup(data);
-        }
-       else {
-        createListMarkup(data);
-      }
-    })
-    .catch(error =>
-      Notiflix.Notify.failure('Oops, there is no country with that name')
-    );
+    .then(data => displayMarkup(data))
+    .catch(error => onError());
 }
 
+
+function displayMarkup(data) {
+  if (data.length > 10) {
+    clearMarkup();
+    Notiflix.Notify.info(
+      'Too many matches found. Please enter a more specific name.'
+    );
+  }
+  if (data.length < 2) {
+    listEl.innerHTML = '';
+    createCountryMarkup(data);
+  } else {
+    createListMarkup(data);
+  }
+}
+
+
+
+function onError() {
+  clearMarkup();
+  Notiflix.Notify.failure('Oops, there is no country with that name');
+}
+
+
+function clearMarkup() {
+  searchedCountry.innerHTML = '';
+  listEl.innerHTML = '';
+}
 
 
 function createListMarkup(arr) {
   const listMarkup = arr
     .map(
-      ({ name: { official }, flags: { svg } }) => `<li>
-<img src="${svg}" alt="The flsg of ${official}" width="60px" height="50px">
+      ({ name: { official }, flags: { svg } }) => `<li class = "country-list_el">
+<img src="${svg}" alt="The flsg of ${official}" width="60px" height="40px">
 <h2>${official}</h2>
 </li>`
     )
     .join('');
 
-  listEl.insertAdjacentHTML('beforeend', listMarkup);
+  listEl.innerHTML = listMarkup;
   listEl.style.listStyle = 'none';
 }
-
 
 
 function createCountryMarkup(arr) {
@@ -82,20 +95,17 @@ function createCountryMarkup(arr) {
         capital,
         population,
         languages,
-      }) => `
-<img src="${svg}" alt="The flag of ${official}" width="60px" height="50px">
-<h1>${official}</h1>
-<p>Capital: ${capital}</p>
-<p>Population: ${population}</p>
-<p>Languages: ${Object.values(languages)}</p>
+      }) => `<div class = "country">
+<img src="${svg}" alt="The flag of ${official}" width="70px" height="50px">
+<h1>${official}</h1></div>
+<p class = "desc">Capital: ${capital}</p>
+<p class = "desc">Population: ${population}</p>
+<p class = "desc">Languages: ${Object.values(languages)}</p>
 `
     )
     .join('');
 
-  searchedCountry.insertAdjacentHTML('beforeend', countryMarkup);
+  searchedCountry.innerHTML = countryMarkup;
 }
-
-
-
 
 
