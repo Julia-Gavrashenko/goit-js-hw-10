@@ -1,5 +1,6 @@
 import './css/styles.css';
 import Notiflix from 'notiflix';
+import { fetchCountries } from './fetchCountries';
 
 const debounce = require('lodash.debounce');
 const DEBOUNCE_DELAY = 300;
@@ -8,23 +9,8 @@ const inputEl = document.querySelector(`#search-box`);
 const listEl = document.querySelector(`.country-list`);
 const searchedCountry = document.querySelector(`.country-info`);
 
-// console.log(inputEl)
-
-function fetchCountries(name) {
-  const BASE_URL = `https://restcountries.com/v3.1/name/${name}`;
-  return fetch(
-    `${BASE_URL}?fields=name,flags,capital,population,languages`
-  ).then(responce => {
-    if (!responce.ok) {
-      throw new Error(responce.statusText);
-    }
-    console.log(responce);
-
-    return responce.json();
-  });
-}
-
 inputEl.addEventListener('input', debounce(onFormElInput, DEBOUNCE_DELAY));
+
 
 function onFormElInput(event) {
   const inputValue = event.target.value.trim();
@@ -39,6 +25,7 @@ function onFormElInput(event) {
     .catch(error => onError());
 }
 
+
 function displayMarkup(data) {
   if (data.length > 10) {
     Notiflix.Notify.info(
@@ -48,24 +35,27 @@ function displayMarkup(data) {
     return;
   }
 
-  if (data.length < 2) {
-    listEl.innerHTML = '';
-    createCountryMarkup(data);
-  } else {
+  if (data.length > 2) {
     searchedCountry.innerHTML = '';
     createListMarkup(data);
+  } else {
+    listEl.innerHTML = '';
+    createCountryMarkup(data);
   }
 }
+
 
 function onError() {
   clearMarkup();
   Notiflix.Notify.failure('Oops, there is no country with that name');
 }
 
+
 function clearMarkup() {
   searchedCountry.innerHTML = '';
   listEl.innerHTML = '';
 }
+
 
 function createListMarkup(arr) {
   const listMarkup = arr
@@ -83,6 +73,7 @@ function createListMarkup(arr) {
   listEl.innerHTML = listMarkup;
   listEl.style.listStyle = 'none';
 }
+
 
 function createCountryMarkup(arr) {
   const countryMarkup = arr
