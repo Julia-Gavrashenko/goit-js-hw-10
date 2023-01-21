@@ -8,8 +8,6 @@ const inputEl = document.querySelector(`#search-box`);
 const listEl = document.querySelector(`.country-list`);
 const searchedCountry = document.querySelector(`.country-info`);
 
-
-
 // console.log(inputEl)
 
 function fetchCountries(name) {
@@ -41,40 +39,41 @@ function onFormElInput(event) {
     .catch(error => onError());
 }
 
-
 function displayMarkup(data) {
   if (data.length > 10) {
-    clearMarkup();
     Notiflix.Notify.info(
       'Too many matches found. Please enter a more specific name.'
     );
+    clearMarkup();
+    return;
   }
+
   if (data.length < 2) {
     listEl.innerHTML = '';
     createCountryMarkup(data);
   } else {
+    searchedCountry.innerHTML = '';
     createListMarkup(data);
   }
 }
-
-
 
 function onError() {
   clearMarkup();
   Notiflix.Notify.failure('Oops, there is no country with that name');
 }
 
-
 function clearMarkup() {
   searchedCountry.innerHTML = '';
   listEl.innerHTML = '';
 }
 
-
 function createListMarkup(arr) {
   const listMarkup = arr
     .map(
-      ({ name: { official }, flags: { svg } }) => `<li class = "country-list_el">
+      ({
+        name: { official },
+        flags: { svg },
+      }) => `<li class = "country-list_el">
 <img src="${svg}" alt="The flsg of ${official}" width="60px" height="40px">
 <h2>${official}</h2>
 </li>`
@@ -84,7 +83,6 @@ function createListMarkup(arr) {
   listEl.innerHTML = listMarkup;
   listEl.style.listStyle = 'none';
 }
-
 
 function createCountryMarkup(arr) {
   const countryMarkup = arr
@@ -107,5 +105,3 @@ function createCountryMarkup(arr) {
 
   searchedCountry.innerHTML = countryMarkup;
 }
-
-
